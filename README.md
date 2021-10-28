@@ -4,7 +4,7 @@ Advanced Algorithms assignment
 
 ### Problem Definition
 - [ ] Implement a 1-D Discrete Fourier Transform on the coefficient vectors of two polynomials, A and B, by multiplication of the Vandermonde matrix. (Hrishit)  
-- [ ] Implement a 1-D Fast Fourier Transform on the same vectors, and ensure the two FTs produce the same result.  (Gautham)
+- [x] Implement a 1-D Fast Fourier Transform on the same vectors, and ensure the two FTs produce the same result.  (Gautham)
 - [ ] Pointwise multiply the results to get the PVR of the product polynomial C.  (Hrishit)
 - [ ] RSA encrypt (128, 256 and 512-bit) the points with public key, and decrypt with a private key. (Gautham) 
 - [ ] Implement a 1-D inverse FFT to interpolate the coefficient vector of C.  (Hrishit)
