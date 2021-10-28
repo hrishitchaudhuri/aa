@@ -2,3 +2,4 @@ init.py
 __pycache__/
 image/
 keys/
+.gitignore

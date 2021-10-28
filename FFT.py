@@ -1,6 +1,10 @@
 import numpy as np
 
 def fft(x):
+    '''
+        1D FFT on a np array
+        
+    '''
     x = np.asarray(x, dtype=float)
     N = x.shape[0]
     if N % 2 > 0:
@@ -15,6 +19,10 @@ def fft(x):
                                X_even + terms[int(N/2):] * X_odd])
 
 def dft(x):
+    '''
+        1D DFT on a np array
+        
+    '''
     x = np.asarray(x, dtype=float)
     N = x.shape[0]
     n = np.arange(N)
