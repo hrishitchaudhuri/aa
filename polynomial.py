@@ -12,6 +12,10 @@ class Polynomial:
         Polynomial constructor.
         """
         self.coef = np.array(coef)
+        self.dft = None
+        self.vand = None
+        self.ivand = None
+
         self.db = len(coef)
 
 
@@ -103,11 +107,43 @@ class Polynomial:
 
         self.coef = self.ivand @ self.dft
 
+        for coef in self.coef:
+            coef = np.round(coef, 3)
+
         return self.coef
 
+    def __mul__(self, other):
+        """
+        Convolution loop on coefficient vectors.
+        """
+        c = []
+        for i in range(self.db):
+            c_temp = 0
+            for j in range(other.db):
+                c_temp += self.coef[i] * other.coef[j]
+                
+            c.append(c_temp)
+
+        return c
+
+    def __matmul__(self, other):
+        """
+        Return Hadamard product of DFT vectors.
+        """
+        if (self.dft is None or other.dft is None):
+            raise ValueError("Please initialize DFT vector.")
+        
+        return np.multiply(self.dft, other.dft)
 
 #TODO: Set better tests
 p = Polynomial([1, 3, 2, 4, 5])
 print(p.dft_regular())
 print(p.dft_vandermonde())
 print(p.idft_vandermond())
+
+q = Polynomial([1, 2, 5, 8, 2])
+print(p * q)
+
+q.dft_vandermonde()
+
+print(p @ q)
