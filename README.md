@@ -16,7 +16,7 @@ Advanced Algorithms assignment
 
 
 ### Dataset Generation
-- [ ] For 1-D transforms, randomly generate coefficient vectors of varying degree bounds (n = 4, 8, 16, ...., 1024, 2048) (Gautham)
+- [x] For 1-D transforms, randomly generate coefficient vectors of varying degree bounds (n = 4, 8, 16, ...., 1024, 2048) (Gautham)
 - [ ] For the 2-D grayscale image, use randomly generated pixel values (Hrishit)
 - [ ] For testing on an actual image, use a grayscale TIFF or lossless JPG and use the OpenCV API to access raw pixel data (Hrishit)
 - [ ] To compare efficiency of the transforms, compare with built-in numpy functions. (Gautham)
