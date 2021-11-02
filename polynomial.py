@@ -87,6 +87,7 @@ class Polynomial:
 
         return self.dft
 
+
     def dft_vandermonde(self):
         """
         Return and set DFT vector using the Vandermonde matrix.
@@ -97,6 +98,7 @@ class Polynomial:
         self.dft = self.vand @ self.coef
 
         return self.dft
+
 
     def idft_vandermond(self):
         """
@@ -112,6 +114,46 @@ class Polynomial:
 
         return self.coef
 
+
+    def fft_recursive(self):
+        log2db = math.log10(self.db) / math.log10(2)
+        if (math.floor(log2db) != math.ceil(log2db)):
+            self.coef = np.append(self.coef, np.zeros((2 ** math.ceil(log2db)) - self.db))
+            self.db = 2 ** math.ceil(log2db)
+        
+        if self.db == 1:
+            self.dft = self.coef.copy()
+            return self.dft
+
+        omega_n = cmath.exp(-2j * math.pi / self.db)
+        omega = 1
+
+        a_0 = []
+        a_1 = []
+
+        for i in range(self.db):
+            if i % 2:
+                a_1.append(self.coef[i])
+            else:
+                a_0.append(self.coef[i])
+
+        a_0 = Polynomial(a_0)
+        a_1 = Polynomial(a_1)
+
+        y_0 = a_0.fft_recursive()
+        y_1 = a_1.fft_recursive()
+
+        y = np.zeros(self.db, dtype=np.complex128)
+
+        for k in range(int(self.db / 2)):
+            y[k] = y_0[k] + omega * y_1[k]
+            y[k + int(self.db / 2)] = y_0[k] - omega * y_1[k]
+            omega *= omega_n
+        
+        self.dft = y
+        return self.dft
+
+
     def __mul__(self, other):
         """
         Convolution loop on coefficient vectors.
@@ -126,6 +168,7 @@ class Polynomial:
 
         return c
 
+
     def __matmul__(self, other):
         """
         Return Hadamard product of DFT vectors.
@@ -134,16 +177,3 @@ class Polynomial:
             raise ValueError("Please initialize DFT vector.")
         
         return np.multiply(self.dft, other.dft)
-
-#TODO: Set better tests
-p = Polynomial([1, 3, 2, 4, 5])
-print(p.dft_regular())
-print(p.dft_vandermonde())
-print(p.idft_vandermond())
-
-q = Polynomial([1, 2, 5, 8, 2])
-print(p * q)
-
-q.dft_vandermonde()
-
-print(p @ q)
