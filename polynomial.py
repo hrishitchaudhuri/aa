@@ -37,12 +37,24 @@ class Polynomial:
         
         return self.roots
 
+    def generate_vandermonde(self, roots):
+        """
+        Return and set Vandermonde matrix given a sequence.
+        """
+        self.vand = []
+        for root in roots:
+            v = []
+            for i in range(self.db):
+                v.append(root ** i)
+            self.vand.append(v)
 
-    def dft(self):
+        return self.vand
+
+
+    def dft_regular(self):
         """
-        Return and set dft vector for Polynomial.
+        Return and set DFT vector for Polynomial.
         """
-        log2db = math.log10(self.db) / math.log10(2)
         self.generate_complex_roots()
 
         self.dft = []
@@ -51,7 +63,22 @@ class Polynomial:
 
         return self.dft
 
+    def dft_vandermonde(self):
+        """
+        Return and set DFT vector using the Vandermonde matrix.
+        """
+        self.generate_complex_roots()
+        self.generate_vandermonde(self.roots)
+
+        self.coef = np.array(self.coef)
+        self.vand = np.array(self.vand)
+
+        self.dft = self.coef @ self.vand
+
+        return self.dft
+
 
 #TODO: Set better tests
 p = Polynomial([1, 3, 2, 4, 5])
-print(p.dft())
+print(p.dft_regular())
+print(p.dft_vandermonde())
