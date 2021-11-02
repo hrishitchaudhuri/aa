@@ -116,6 +116,9 @@ class Polynomial:
 
 
     def fft_recursive(self):
+        """
+        Set and return DFT vector via Fast Fourier Transform.
+        """
         log2db = math.log10(self.db) / math.log10(2)
         if (math.floor(log2db) != math.ceil(log2db)):
             self.coef = np.append(self.coef, np.zeros((2 ** math.ceil(log2db)) - self.db))
