@@ -3,8 +3,8 @@ from polynomial import Polynomial
 from matrix import Matrix
 
 #TODO: Set better tests
-
-p = Polynomial([1, 3, 2, 4, 5, 0, 0, 0])
+"""
+p = Polynomial([1, 3, 2, 4, 5])
 print(p.dft_regular())
 print(p.fft_recursive())
 print(np.fft.fft(p.coef))
@@ -26,3 +26,34 @@ mat = Matrix(mat)
 
 print(mat.fft_2d())
 print(np.fft.fft2(mat.matrix))
+"""
+
+a1 = [1, 5, 6, 2, 3]
+a2 = [4, 2, 9, 3, 9]
+
+p = Polynomial(a1)
+q = Polynomial(a2)
+
+c1 = p * q
+
+m = len(a1)
+n = len(a2)
+
+for i in range(m - 1):
+    a2.append(0)
+
+for i in range(n - 1):
+    a1.append(0)
+
+p = Polynomial(a1)
+q = Polynomial(a2)
+
+p.fft_recursive()
+q.fft_recursive()
+
+c2 = p @ q
+
+c2.ifft_recursive()
+
+print(c1.coef)
+print(c2.coef)

@@ -2,6 +2,9 @@ import math
 import cmath
 import numpy as np
 
+def cround(cx):
+    return round(cx.real, 4) + round(cx.imag, 4) * 1j
+
 class Polynomial:
     """
     A class to describe polynomials. 
@@ -65,7 +68,7 @@ class Polynomial:
         for root in roots:
             v = []
             for i in range(self.db):
-                v.append(root ** i)
+                v.append(cround(root ** i))
             self.vand.append(v)
 
         self.vand = np.array(self.vand)
@@ -80,7 +83,7 @@ class Polynomial:
         for root in roots:
             v = []
             for i in range(self.db):
-                v.append((root ** -i) / self.db)
+                v.append(cround((root ** -i) / self.db))
             self.ivand.append(v)
 
         self.ivand = np.array(self.ivand)
@@ -96,7 +99,7 @@ class Polynomial:
 
         self.dft = []
         for i in range(self.db):
-            self.dft.append(self.eval(self.roots[i]))
+            self.dft.append(cround(self.eval(self.roots[i])))
 
         self.dft = np.array(self.dft)
 
@@ -125,7 +128,7 @@ class Polynomial:
         self.coef = self.ivand @ self.dft
 
         for coef in self.coef:
-            coef = np.round(coef, 3)
+            coef = cround(coef)
 
         return self.coef
 
@@ -141,7 +144,7 @@ class Polynomial:
         if (math.floor(log2db) != math.ceil(log2db)):
             self.coef = np.append(self.coef, np.zeros((2 ** math.ceil(log2db)) - self.db))
             self.db = 2 ** math.ceil(log2db)
-        
+
         if self.db == 1:
             self.dft = self.coef.copy()
             return self.dft
@@ -167,8 +170,8 @@ class Polynomial:
         y = np.zeros(self.db, dtype=np.complex128)
 
         for k in range(int(self.db / 2)):
-            y[k] = y_0[k] + omega * y_1[k]
-            y[k + int(self.db / 2)] = y_0[k] - omega * y_1[k]
+            y[k] = cround(y_0[k] + omega * y_1[k])
+            y[k + int(self.db / 2)] = cround(y_0[k] - omega * y_1[k])
             omega *= omega_n
         
         self.dft = y
@@ -181,12 +184,12 @@ class Polynomial:
         """
         if self.dft is None:
             raise ValueError('Please initialize DFT vector.')
-        
+
         log2db = math.log10(self.db) / math.log10(2)
         if (math.floor(log2db) != math.ceil(log2db)):
             self.dft = np.append(self.dft, np.zeros((2 ** math.ceil(log2db)) - self.db))
             self.db = 2 ** math.ceil(log2db)
-        
+
         if self.db == 1:
             self.coef = self.dft.copy()
             return self.coef
@@ -213,12 +216,13 @@ class Polynomial:
         y = np.zeros(self.db, dtype=np.complex128)
 
         for k in range(int(self.db / 2)):
-            y[k] = (y_0[k] + omega * y_1[k])
-            y[k + int(self.db / 2)] = (y_0[k] - omega * y_1[k])
+            y[k] = cround(y_0[k] + omega * y_1[k])
+            y[k + int(self.db / 2)] = cround(y_0[k] - omega * y_1[k])
             omega *= omega_n
         
         self.coef = y
         return self.coef
+
 
     def ifft_recursive(self):
         """
@@ -230,20 +234,22 @@ class Polynomial:
 
         return self.coef
 
+
     def __mul__(self, other):
         """
         Convolution loop on coefficient vectors.
         """
-        c = []
-        for i in range(self.db):
-            c_temp = 0
-            for j in range(other.db):
-                c_temp += self.coef[i] * other.coef[j]
-                
-            c.append(c_temp)
+        m = self.db
+        n = other.db
 
-        return c
+        length = m + n - 1
 
+        w = np.zeros(length)
+        for i in range(m):
+            for j in range(n):
+                w[i + j] += self.coef[i] * other.coef[j] 
+
+        return Polynomial(w)
 
     def __matmul__(self, other):
         """
