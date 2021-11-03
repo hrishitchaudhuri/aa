@@ -55,15 +55,15 @@ c2 = p @ q
 
 c2.ifft_recursive()
 
-print(c1.coef)
-print(c2.coef)
+# print(c1.coef)
+# print(c2.coef)
 
 
-mat = np.array([[2, 5, 4, 3], [9, 3, 1, 5], [12, 14, 1, 13], [9, 1, 2, 5]])
-mat_fft = matrix.fft_2d(mat)
-print(mat_fft)
-print(np.fft.fft2(mat))
+mat = np.array([[2, 5, 4, 3, 2], [9, 3, 1, 5, 1], [12, 14, 1, 13, 4], [25, 9, 1, 2, 5], [11, 14, 19, 2, 13]])
+m1 = matrix.matrix_compression(mat)
+m2 = np.fft.fft2(mat)
+m2 = np.fft.ifft2(m2)
+print(m1)
+print(m2)
 
-print(np.fft.ifft2(mat_fft))
-mat = matrix.ifft_2d(mat_fft)
-print(mat)
+print(np.allclose(m1, m2, rtol=1e-3, atol=1e-5))

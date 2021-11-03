@@ -9,6 +9,7 @@ def fft_2d(mtx):
     x, y = mtx.shape
     fft_matrix = []
     for i in range(x):
+        print("ROW: ", i)
         temp = Polynomial(mtx[i])
         fft_matrix.append(temp.fft_recursive())
 
@@ -17,6 +18,7 @@ def fft_2d(mtx):
     fft_final = []
     x, y = fft_matrix.shape
     for i in range(x):
+        print("COL: ", i)
         temp = Polynomial(fft_matrix[i])
         fft_final.append(temp.fft_recursive())
 
@@ -44,3 +46,12 @@ def ifft_2d(dft2):
 
     final_matrix = np.transpose(np.array(final_matrix))
     return final_matrix
+
+
+def matrix_compression(mtx):
+    x, y = mtx.shape
+
+    m1 = fft_2d(mtx)
+    m2 = ifft_2d(m1)
+
+    return m2[0:x, 0:y]
