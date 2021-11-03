@@ -1,6 +1,6 @@
 import numpy as np
 from polynomial import Polynomial 
-from matrix import Matrix
+import matrix
 
 #TODO: Set better tests
 """
@@ -57,3 +57,13 @@ c2.ifft_recursive()
 
 print(c1.coef)
 print(c2.coef)
+
+
+mat = np.array([[2, 5, 4, 3], [9, 3, 1, 5], [12, 14, 1, 13], [9, 1, 2, 5]])
+mat_fft = matrix.fft_2d(mat)
+print(mat_fft)
+print(np.fft.fft2(mat))
+
+print(np.fft.ifft2(mat_fft))
+mat = matrix.ifft_2d(mat_fft)
+print(mat)
