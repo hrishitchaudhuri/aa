@@ -5,4 +5,8 @@ keys/
 .gitignore
 Datasets/
 pdf/
+<<<<<<< HEAD
 reference/
+=======
+.spyproject/
+>>>>>>> 4081d89dc81b3620f5ec04099654818a3979d94f
