@@ -1,4 +1,5 @@
-from random import choice
+from random import *
+import numpy as np
 
 def fermat_base2_test(n):
     '''
@@ -8,6 +9,41 @@ def fermat_base2_test(n):
     if pow(2,n-1,n)==1:
         return 1
     return 0
+
+def miiller_test_helper(d, n):
+     
+    a = 2 + random.randint(1, n - 4);
+ 
+    x = pow(a, d, n);
+ 
+    if (x == 1 or x == n - 1):
+        return True;
+    while (d != n - 1):
+        x = (x * x) % n;
+        d *= 2;
+ 
+        if (x == 1):
+            return False;
+        if (x == n - 1):
+            return True;
+    return False;
+
+def miller_test( n, k):
+     
+    if (n <= 1 or n == 4):
+        return False;
+    if (n <= 3):
+        return True;
+
+    d = n - 1;
+    while (d % 2 == 0):
+        d //= 2;
+ 
+    for i in range(k):
+        if (miiller_test_helper(d, n) == False):
+            return False;
+    return True;
+    
 
 def generate_large_odd(bitlength):
     '''
@@ -32,16 +68,11 @@ def generate_large_primes(bitlength):
     '''
     num1=generate_large_odd(bitlength)
     num2=generate_large_odd(bitlength)
-
-    # RUN TESTS FOR PRIMALITY
-    # 1. Fermat's pseudo primality test
-    while fermat_base2_test(num1)==0:
+    
+    while fermat_base2_test(num1) and miller_test(num1,4):
         num1=generate_large_odd(bitlength)
-    while fermat_base2_test(num2)==0:
+    while fermat_base2_test(num2) and miller_test(num2, 4):
         num2=generate_large_odd(bitlength)
-    
-    # 2. Miller-Rabin primality test
-    
 
     return num1,num2
     
