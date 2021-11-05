@@ -1,5 +1,6 @@
 from random import *
 import numpy as np
+import math
 
 def fermat_base2_test(n):
     '''
@@ -9,6 +10,13 @@ def fermat_base2_test(n):
     if pow(2,n-1,n)==1:
         return 1
     return 0
+
+def trial_division(n):
+    for i in range(2,math.sqrt(n)):
+        if n%i == 0:
+            return False
+    return True
+
 
 def miiller_test_helper(d, n):
      
@@ -69,9 +77,9 @@ def generate_large_primes(bitlength):
     num1=generate_large_odd(bitlength)
     num2=generate_large_odd(bitlength)
     
-    while fermat_base2_test(num1) and miller_test(num1,4):
+    while fermat_base2_test(num1) and miller_test(num1,4) and trial_division(num1):
         num1=generate_large_odd(bitlength)
-    while fermat_base2_test(num2) and miller_test(num2, 4):
+    while fermat_base2_test(num2) and miller_test(num2, 4) and trial_division(num2):
         num2=generate_large_odd(bitlength)
 
     return num1,num2
