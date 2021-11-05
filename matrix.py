@@ -33,6 +33,7 @@ def ifft_2d(dft2):
     x, y = dft2.shape
     orig_matrix = []
     for i in range(x):
+        print("ROW: ", i)
         temp = Polynomial(dft=dft2[i])
         orig_matrix.append(temp.ifft_recursive())
 
@@ -41,6 +42,7 @@ def ifft_2d(dft2):
     final_matrix = []
     x, y = orig_matrix.shape
     for i in range(x):
+        print("COL: ", i)
         temp = Polynomial(dft=orig_matrix[i])
         final_matrix.append(temp.ifft_recursive())
 

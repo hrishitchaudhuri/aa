@@ -6,26 +6,39 @@ import matrix
 # REFACTOR THIS ENTIRE FILE
 
 atj = cv2.imread('images/atj_grayscale.jpg', 0)
+# cv2.imwrite('images/atj_grayscale.png', atj)
 
+# atj = cv2.imread('images/atj_grayscale.png', 0)
 print(atj.shape)
 x, y = atj.shape
 
-m1 = np.fft.fft2(atj)
+n1 = np.fft.fft2(atj)
 
-m2 = []
-threshold = 500
-for i in range(x):
-    m2.append([])
-    for j in range(y):
-        if abs(round(m1[i][j].real)) < threshold:
-            m2[i].append(0)
-        else:
-            m2[i].append(m1[i][j])
+m1 = matrix.fft_2d(atj)
 
-m1 = np.fft.ifft2(m2)
+n2 = np.sort(np.abs(n1.reshape(-1)))
+for keep in [0.1, 0.05, 0.01]:
+    thresh = n2[int(np.floor((1 - keep) * len(n2)))]
+    index = np.abs(n1) > thresh
 
-m2 = np.real(m1)
+    low = n1 * index
 
-filename = 'images/atj_fft_' + str(threshold) + '.jpg'
+    n3 = np.fft.ifft2(low).real
 
-cv2.imwrite(filename, m2)
+    filename = 'images/atj_fft_' + str(keep * 100) + '.jpg'
+
+    cv2.imwrite(filename, n3)
+
+
+m2 = np.sort(np.abs(m1.reshape(-1)))
+for keep in [0.1, 0.05, 0.01]:
+    thresh = m2[int(np.floor((1 - keep) * len(m2)))]
+    index = np.abs(m1) > thresh
+
+    low = m1 * index
+
+    m3 = matrix.ifft_2d(low).real
+
+    filename = 'images/atj_hfft_' + str(keep * 100) + '.jpg'
+
+    cv2.imwrite(filename, m3[0:x, 0:y])
