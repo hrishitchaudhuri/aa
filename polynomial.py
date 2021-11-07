@@ -19,7 +19,6 @@ class Polynomial:
             self.dft = np.array(dft) # establish test for checking
             self.db = len(coef)
 
-
         elif coef is not None:
             self.coef = np.array(coef)
             self.db = len(coef)
@@ -118,7 +117,7 @@ class Polynomial:
         return self.dft
 
 
-    def idft_vandermond(self):
+    def idft_vandermonde(self):
         """
         Return and set coefficient vector using the inverse Vandermonde matrix.
         """
