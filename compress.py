@@ -1,9 +1,10 @@
+"""Test file for compressing images"""
 import image
 
-FILE_PATH='images/chess/chess_grayscale'
-SUFFIX='jpg'
+FILE_PATH = 'images/chess/chess_grayscale'
+SUFFIX = 'jpg'
 
-FILE_NAME=FILE_PATH+'.'+SUFFIX
+FILE_NAME = FILE_PATH + '.' + SUFFIX
 
 for keep in [0.1, 0.05, 0.01]:
     wr_filename_1 = FILE_PATH + '_numpy_' + str(keep * 100) + '.' + SUFFIX

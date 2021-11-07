@@ -1,11 +1,14 @@
+"""Functions for image compression."""
 import cv2
 import numpy as np
 
 import matrix
 
 def numpy_compress_image(read_filename, write_filename, compression=0.1):
+    """
+    Compress image using numpy FFT functions.
+    """
     img = cv2.imread(read_filename, 0)
-    x, y = img.shape
 
     fourier_matrix = np.fft.fft2(img)
 
@@ -21,8 +24,11 @@ def numpy_compress_image(read_filename, write_filename, compression=0.1):
 
 
 def painpy_compress_image(read_filename, write_filename, compression=0.1):
+    """
+    Compress image using home-made FFT functions.
+    """
     img = cv2.imread(read_filename, 0)
-    x, y = img.shape
+    rows, cols = img.shape
 
     fourier_matrix = matrix.fft_2d(img)
 
@@ -34,4 +40,4 @@ def painpy_compress_image(read_filename, write_filename, compression=0.1):
 
     final_matrix = matrix.ifft_2d(low_values).real
 
-    cv2.imwrite(write_filename, final_matrix[0:x, 0:y])
+    cv2.imwrite(write_filename, final_matrix[0:rows, 0:cols])

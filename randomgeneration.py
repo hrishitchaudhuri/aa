@@ -1,3 +1,4 @@
+"""Randomly generate DFT/FFT tests."""
 import numpy as np
 import matrix
 
