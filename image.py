@@ -1,44 +1,43 @@
+"""Functions for image compression."""
 import cv2
 import numpy as np
 
 import matrix
 
-# REFACTOR THIS ENTIRE FILE
+def numpy_compress_image(read_filename, write_filename, compression=0.1):
+    """
+    Compress image using numpy FFT functions.
+    """
+    img = cv2.imread(read_filename, 0)
 
-atj = cv2.imread('images/atj_grayscale.jpg', 0)
-# cv2.imwrite('images/atj_grayscale.png', atj)
+    fourier_matrix = np.fft.fft2(img)
 
-# atj = cv2.imread('images/atj_grayscale.png', 0)
-print(atj.shape)
-x, y = atj.shape
+    fourier_matrix_sorted = np.sort(np.abs(fourier_matrix.reshape(-1)))
+    threshold = fourier_matrix_sorted[int(np.floor((1 - compression) * len(fourier_matrix_sorted)))]
 
-n1 = np.fft.fft2(atj)
+    indices = np.abs(fourier_matrix) > threshold
+    low_values = fourier_matrix * indices
 
-m1 = matrix.fft_2d(atj)
+    final_matrix = np.fft.ifft2(low_values).real
 
-n2 = np.sort(np.abs(n1.reshape(-1)))
-for keep in [0.1, 0.05, 0.01]:
-    thresh = n2[int(np.floor((1 - keep) * len(n2)))]
-    index = np.abs(n1) > thresh
-
-    low = n1 * index
-
-    n3 = np.fft.ifft2(low).real
-
-    filename = 'images/atj_fft_' + str(keep * 100) + '.jpg'
-
-    cv2.imwrite(filename, n3)
+    cv2.imwrite(write_filename, final_matrix)
 
 
-m2 = np.sort(np.abs(m1.reshape(-1)))
-for keep in [0.1, 0.05, 0.01]:
-    thresh = m2[int(np.floor((1 - keep) * len(m2)))]
-    index = np.abs(m1) > thresh
+def painpy_compress_image(read_filename, write_filename, compression=0.1):
+    """
+    Compress image using home-made FFT functions.
+    """
+    img = cv2.imread(read_filename, 0)
+    rows, cols = img.shape
 
-    low = m1 * index
+    fourier_matrix = matrix.fft_2d(img)
 
-    m3 = matrix.ifft_2d(low).real
+    fourier_matrix_sorted = np.sort(np.abs(fourier_matrix.reshape(-1)))
+    threshold = fourier_matrix_sorted[int(np.floor((1 - compression) * len(fourier_matrix_sorted)))]
 
-    filename = 'images/atj_hfft_' + str(keep * 100) + '.jpg'
+    indices = np.abs(fourier_matrix) > threshold
+    low_values = fourier_matrix * indices
 
-    cv2.imwrite(filename, m3[0:x, 0:y])
+    final_matrix = matrix.ifft_2d(low_values).real
+
+    cv2.imwrite(write_filename, final_matrix[0:rows, 0:cols])
