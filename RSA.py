@@ -7,20 +7,23 @@ def fermat_base2_test(n):
         Runs base2 primality test on n with k trials,
         returns 0 for composite, 1 for prime
     '''
+    #print('fb2t')
     if pow(2,n-1,n)==1:
         return 1
     return 0
 
-def trial_division(n):
-    for i in range(2,math.sqrt(n)):
-        if n%i == 0:
+def trial_division(n, trials):
+    #print(math.sqrt(n))
+    for i in range(trials):
+        check=randint(2,math.sqrt(n))
+        if n%check == 0:
             return False
     return True
 
 
 def miiller_test_helper(d, n):
      
-    a = 2 + random.randint(1, n - 4);
+    a = 2 + randint(1, n - 4);
  
     x = pow(a, d, n);
  
@@ -59,12 +62,12 @@ def generate_large_odd(bitlength):
         input: bit length
         output: odd number of given bit length
     '''
-    num1='0b1'
+    n='0b1'
     for i in range(bitlength-2):
-        num1 += choice(['0','1'])
-    num1 += '1'
-    num1=(int(num1,2))
-    return num1
+        n += choice(['0','1'])
+    n += '1'
+    n=(int(n,2))
+    return n
 
 
 def generate_large_primes(bitlength):
@@ -77,10 +80,40 @@ def generate_large_primes(bitlength):
     num1=generate_large_odd(bitlength)
     num2=generate_large_odd(bitlength)
     
-    while fermat_base2_test(num1) and miller_test(num1,4) and trial_division(num1):
+    while not(fermat_base2_test(num1) and miller_test(num1,4) and trial_division(num1,100)):
         num1=generate_large_odd(bitlength)
-    while fermat_base2_test(num2) and miller_test(num2, 4) and trial_division(num2):
+    while not(fermat_base2_test(num2) and miller_test(num2, 4) and trial_division(num2,100)):
         num2=generate_large_odd(bitlength)
 
     return num1,num2
+
+def gcd(a, b):
+   while a != 0:
+      a, b = b % a, a
+   return b
+
+def findModInverse(a, m):
+   if gcd(a, m) != 1:
+      return None
+   u1, u2, u3 = 1, 0, a
+   v1, v2, v3 = 0, 1, m
+   
+   while v3 != 0:
+        q = u3 // v3
+        v1, v2, v3, u1, u2, u3 = (u1 - q * v1), (u2 - q * v2), (u3 - q * v3), v1, v2, v3
+   return u1 % m
+
+def keygen(size):
+    '''
     
+    '''
+    p,q=generate_large_primes(size)
+    n=p*q
+    e=choice([2*i+1 for i in range(100)])
+    while gcd(e, (p-1)*(q-1)) != 1:
+        e=choice([2*i+1 for i in range(100)])
+    # d is the mod inverse of e,(p-1)*(q-1)
+    d=findModInverse(e,n)
+    pubkey=(e,n)
+    privkey=(d,n)
+    return {'public':pubkey,'private':privkey}
