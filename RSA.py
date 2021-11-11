@@ -113,7 +113,7 @@ def keygen(size):
     while gcd(e, (p-1)*(q-1)) != 1:
         e=choice([2*i+1 for i in range(100)])
     # d is the mod inverse of e,(p-1)*(q-1)
-    d=findModInverse(e,n)
+    d=findModInverse(e,(p-1)*(q-1))
     pubkey=(e,n)
     privkey=(d,n)
     return {'public':pubkey,'private':privkey}
