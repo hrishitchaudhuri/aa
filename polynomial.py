@@ -73,7 +73,7 @@ class Polynomial:
         for root in roots:
             values = []
             for i in range(self.degree):
-                values.append(cround(root ** i))
+                values.append(root ** i)
             self.vand.append(values)
 
         self.vand = np.array(self.vand)
@@ -89,7 +89,7 @@ class Polynomial:
         for root in roots:
             values = []
             for i in range(self.degree):
-                values.append(cround((root ** -i) / self.degree))
+                values.append((root ** -i) / self.degree)
             self.ivand.append(values)
 
         self.ivand = np.array(self.ivand)
@@ -105,7 +105,7 @@ class Polynomial:
 
         self.dft = []
         for i in range(self.degree):
-            self.dft.append(cround(self.eval(self.roots[i])))
+            self.dft.append(self.eval(self.roots[i]))
 
         self.dft = np.array(self.dft)
 
@@ -132,9 +132,6 @@ class Polynomial:
         self.generate_inv_vandermonde(self.roots)
 
         self.coef = self.ivand @ self.dft
-
-        for coef in self.coef:
-            coef = cround(coef)
 
         return self.coef
 
@@ -176,8 +173,8 @@ class Polynomial:
         y_tot = np.zeros(self.degree, dtype=np.complex128)
 
         for k in range(int(self.degree / 2)):
-            y_tot[k] = cround(y_0[k] + omega * y_1[k])
-            y_tot[k + int(self.degree / 2)] = cround(y_0[k] - omega * y_1[k])
+            y_tot[k] = y_0[k] + omega * y_1[k]
+            y_tot[k + int(self.degree / 2)] = y_0[k] - omega * y_1[k]
             omega *= omega_n
 
         self.dft = y_tot
@@ -222,8 +219,8 @@ class Polynomial:
         y_tot = np.zeros(self.degree, dtype=np.complex128)
 
         for k in range(int(self.degree / 2)):
-            y_tot[k] = cround(y_0[k] + omega * y_1[k])
-            y_tot[k + int(self.degree / 2)] = cround(y_0[k] - omega * y_1[k])
+            y_tot[k] = y_0[k] + omega * y_1[k]
+            y_tot[k + int(self.degree / 2)] = y_0[k] - omega * y_1[k]
             omega *= omega_n
 
         self.coef = y_tot
