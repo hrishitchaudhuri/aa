@@ -117,3 +117,40 @@ def keygen(size):
     pubkey=(e,n)
     privkey=(d,n)
     return {'public':pubkey,'private':privkey}
+
+def __encrypt(block, e, n, keysize=128):
+    '''
+        8 byte block encrypted using pubkey
+    '''
+    c=b''
+    blocknum=int.from_bytes(block, 'little')
+    #print(blocknum)
+    result=pow(blocknum, e, n).to_bytes(keysize,'little')
+    for i in result:
+        if i != 0:
+            c += i.to_bytes(1,'little')
+    return c
+
+
+def encrypt(msg, e, n):
+    '''
+        msg: byte stream to be encrypted
+        e, n: derived from public key
+        returns cipher (bytestream) which is formed by c=(msg**e)mod n
+
+        calls __encrypt by splitting msg bytestream into 8 byte blocks
+
+        same function is called for decrypt as well (pass e = d for decryption)
+    '''
+    #PADDING
+    cipher=b''
+    i=0
+    print(len(msg))
+    while i <= len(msg)-7:
+        block=msg[i:i+7]
+        print('BLOCK BEING ENC: ',block, 'i is at: ',i)
+        cipher +=__encrypt(block,e,n)
+        i+=8
+
+    return cipher
+
