@@ -120,11 +120,10 @@ def keygen(size):
 
 def __encrypt(block, e, n, keysize=128):
     '''
-        8 byte block encrypted using pubkey
+        keysize byte block encrypted/decrypted using pubkey/privkey
     '''
     c=b''
     blocknum=int.from_bytes(block, 'big')
-    #print(blocknum)
     result=pow(blocknum, e, n).to_bytes(keysize,'big')
     for i in result:
         if i != 0:
@@ -134,6 +133,8 @@ def __encrypt(block, e, n, keysize=128):
 
 def encrypt(msg, e, n, keysize=128):
     '''
+        Only pass bytes/bytearray as msg input
+
         msg: byte stream to be encrypted
         e, n: derived from public key
         returns cipher (bytestream) which is formed by c=(msg**e)mod n
@@ -144,20 +145,20 @@ def encrypt(msg, e, n, keysize=128):
     '''
     #PADDING
     block_size=int((keysize/32)*8)
-    #print(block_size)
+    pad_size=block_size - len(msg)%block_size
+    if pad_size != 0:
+        msg += b'\x00'*pad_size
+    #print(msg)
     if len(msg) <= block_size:
         return __encrypt(msg, e, n, keysize=keysize)
 
     cipher=b''
     i=0
-    #print(len(msg))
+
     while i <= len(msg)-block_size:
         block=msg[i:i+block_size]
-        #print('BLOCK BEING ENC: ',block, 'i is at: ',i)
-        #print(__encrypt(block,e,n, keysize=keysize))
         cipher = cipher + __encrypt(block,e,n)
         i+=block_size
-        #print(i)
 
     return cipher
 
