@@ -4,35 +4,32 @@ import math
 
 def fermat_base2_test(n):
     '''
-        Runs base2 primality test on n with k trials,
-        returns 0 for composite, 1 for prime
+    Runs base2 primality test on n with k trials,
+    returns 0 for composite, 1 for prime
     '''
-    #print('fb2t')
-    if pow(2,n-1,n)==1:
+    if pow(2,n-1,n) == 1:
         return 1
     return 0
 
 def trial_division(n, trials):
-    #print(math.sqrt(n))
+    '''
+    Trial Division Test
+    '''
     for i in range(trials):
-        check=randint(2,int(math.sqrt(n)))
+        check = randint(2,int(math.sqrt(n)))
         if n%check == 0:
             return False
     return True
 
 
 def miiller_test_helper(d, n):
-     
     a = 2 + randint(1, n - 4);
- 
     x = pow(a, d, n);
- 
     if (x == 1 or x == n - 1):
         return True;
     while (d != n - 1):
         x = (x * x) % n;
         d *= 2;
- 
         if (x == 1):
             return False;
         if (x == n - 1):
@@ -40,16 +37,16 @@ def miiller_test_helper(d, n):
     return False;
 
 def miller_test( n, k):
-     
+    '''
+    Miller Rabin primality test
+    '''
     if (n <= 1 or n == 4):
         return False;
     if (n <= 3):
         return True;
-
     d = n - 1;
     while (d % 2 == 0):
         d //= 2;
- 
     for i in range(k):
         if (miiller_test_helper(d, n) == False):
             return False;
@@ -62,7 +59,7 @@ def generate_large_odd(bitlength):
         input: bit length
         output: odd number of given bit length
     '''
-    n='0b1'
+    n = '0b1'
     for i in range(bitlength-2):
         n += choice(['0','1'])
     n += '1'
@@ -75,7 +72,6 @@ def generate_large_primes(bitlength):
         generates 2 large odd numbers of given bit length,
         runs fermat and M-R test and trial division for primality
         return 2 large primes of given bitlength
-
     '''
     num1=generate_large_odd(bitlength)
     num2=generate_large_odd(bitlength)
@@ -92,7 +88,7 @@ def gcd(a, b):
       a, b = b % a, a
    return b
 
-def findModInverse(a, m):
+def find_mod_inverse(a, m):
    if gcd(a, m) != 1:
       return None
    u1, u2, u3 = 1, 0, a
@@ -105,26 +101,27 @@ def findModInverse(a, m):
 
 def keygen(size):
     '''
-    
+    Generates RSA public and private keys of given bitlength
     '''
-    p,q=generate_large_primes(size)
-    n=p*q
-    e=choice([2*i+1 for i in range(100)])
+    p,q = generate_large_primes(size)
+    n = p*q
+    e = choice([2*i+1 for i in range(100)])
+
     while gcd(e, (p-1)*(q-1)) != 1:
-        e=choice([2*i+1 for i in range(100)])
-    # d is the mod inverse of e,(p-1)*(q-1)
-    d=findModInverse(e,(p-1)*(q-1))
-    pubkey=(e,n)
-    privkey=(d,n)
+        e = choice([2*i+1 for i in range(100)])
+    
+    d = find_mod_inverse(e,(p-1)*(q-1))
+    pubkey = (e,n)
+    privkey = (d,n)
     return {'public':pubkey,'private':privkey}
 
 def __encrypt(block, e, n, keysize=128):
     '''
         keysize byte block encrypted/decrypted using pubkey/privkey
     '''
-    c=b''
-    blocknum=int.from_bytes(block, 'big')
-    result=pow(blocknum, e, n).to_bytes(keysize,'big')
+    c = b''
+    blocknum = int.from_bytes(block, 'big')
+    result = pow(blocknum, e, n).to_bytes(keysize,'big')
     for i in result:
         if i != 0:
             c += i.to_bytes(1,'big')
@@ -143,22 +140,20 @@ def encrypt(msg, e, n, keysize=128):
 
         same function is called for decrypt as well (pass e = d for decryption)
     '''
-    #PADDING
-    block_size=int((keysize/32)*8)
-    pad_size=block_size - len(msg)%block_size
+    block_size = int((keysize/32)*8)
+    pad_size = block_size - len(msg)%block_size
+
     if pad_size != 0:
         msg += b'\x00'*pad_size
-    #print(msg)
     if len(msg) <= block_size:
         return __encrypt(msg, e, n, keysize=keysize)
 
-    cipher=b''
-    i=0
-
+    cipher = b''
+    i = 0
     while i <= len(msg)-block_size:
-        block=msg[i:i+block_size]
+        block = msg[i:i+block_size]
         cipher = cipher + __encrypt(block,e,n)
-        i+=block_size
+        i += block_size
 
     return cipher
 
