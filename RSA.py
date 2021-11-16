@@ -15,7 +15,7 @@ def fermat_base2_test(n):
 def trial_division(n, trials):
     #print(math.sqrt(n))
     for i in range(trials):
-        check=randint(2,math.sqrt(n))
+        check=randint(2,int(math.sqrt(n)))
         if n%check == 0:
             return False
     return True
@@ -123,16 +123,17 @@ def __encrypt(block, e, n, keysize=128):
         8 byte block encrypted using pubkey
     '''
     c=b''
-    blocknum=int.from_bytes(block, 'little')
+    blocknum=int.from_bytes(block, 'big')
     #print(blocknum)
-    result=pow(blocknum, e, n).to_bytes(keysize,'little')
-    for i in result:
-        if i != 0:
-            c += i.to_bytes(1,'little')
-    return c
+    result=pow(blocknum, e, n).to_bytes(keysize,'big')
+    # for i in result:
+    #     if i != 0:
+    #         c += i.to_bytes(1,'little')
+    # return c
+    return result
 
 
-def encrypt(msg, e, n):
+def encrypt(msg, e, n, keysize=128):
     '''
         msg: byte stream to be encrypted
         e, n: derived from public key
@@ -143,14 +144,19 @@ def encrypt(msg, e, n):
         same function is called for decrypt as well (pass e = d for decryption)
     '''
     #PADDING
+    if len(msg) <= 8:
+        return __encrypt(msg, e, n, keysize=keysize)
+
     cipher=b''
     i=0
-    print(len(msg))
-    while i <= len(msg)-7:
-        block=msg[i:i+7]
-        print('BLOCK BEING ENC: ',block, 'i is at: ',i)
-        cipher +=__encrypt(block,e,n)
+    #print(len(msg))
+    while i <= len(msg)-8:
+        block=msg[i:i+8]
+        #print('BLOCK BEING ENC: ',block, 'i is at: ',i)
+        #print(__encrypt(block,e,n, keysize=keysize))
+        cipher = cipher + __encrypt(block,e,n)
         i+=8
+        #print(i)
 
     return cipher
 
