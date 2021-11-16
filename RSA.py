@@ -2,13 +2,15 @@ from random import *
 import numpy as np
 import math
 
-def fermat_base2_test(n):
+def fermat_base2_test(n, k):
     '''
     Runs base2 primality test on n with k trials,
     returns 0 for composite, 1 for prime
     '''
-    if pow(2,n-1,n) == 1:
-        return 1
+    for i in range(k):
+        a = randint(2, n-2)
+        if pow(a,n-1,n) == 1:
+            return 1
     return 0
 
 def trial_division(n, trials):
@@ -76,9 +78,9 @@ def generate_large_primes(bitlength):
     num1=generate_large_odd(bitlength)
     num2=generate_large_odd(bitlength)
     
-    while not(fermat_base2_test(num1) and miller_test(num1,4) and trial_division(num1,100)):
+    while not(fermat_base2_test(num1,3) and miller_test(num1,4) and trial_division(num1,100)):
         num1=generate_large_odd(bitlength)
-    while not(fermat_base2_test(num2) and miller_test(num2, 4) and trial_division(num2,100)):
+    while not(fermat_base2_test(num2,3) and miller_test(num2, 4) and trial_division(num2,100)):
         num2=generate_large_odd(bitlength)
 
     return num1,num2
