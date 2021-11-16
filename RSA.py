@@ -126,11 +126,10 @@ def __encrypt(block, e, n, keysize=128):
     blocknum=int.from_bytes(block, 'big')
     #print(blocknum)
     result=pow(blocknum, e, n).to_bytes(keysize,'big')
-    # for i in result:
-    #     if i != 0:
-    #         c += i.to_bytes(1,'little')
-    # return c
-    return result
+    for i in result:
+        if i != 0:
+            c += i.to_bytes(1,'big')
+    return c
 
 
 def encrypt(msg, e, n, keysize=128):
@@ -144,18 +143,20 @@ def encrypt(msg, e, n, keysize=128):
         same function is called for decrypt as well (pass e = d for decryption)
     '''
     #PADDING
-    if len(msg) <= 8:
+    block_size=int((keysize/32)*8)
+    #print(block_size)
+    if len(msg) <= block_size:
         return __encrypt(msg, e, n, keysize=keysize)
 
     cipher=b''
     i=0
     #print(len(msg))
-    while i <= len(msg)-8:
-        block=msg[i:i+8]
+    while i <= len(msg)-block_size:
+        block=msg[i:i+block_size]
         #print('BLOCK BEING ENC: ',block, 'i is at: ',i)
         #print(__encrypt(block,e,n, keysize=keysize))
         cipher = cipher + __encrypt(block,e,n)
-        i+=8
+        i+=block_size
         #print(i)
 
     return cipher
