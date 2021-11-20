@@ -1,6 +1,36 @@
 '''tests for rsa.py'''
-from RSA import encrypt, keygen
+from RSA import encrypt, Keys
+from fft_rsa import convert_arr_to_bytes, convert_bytes_to_arr
+from polynomial import Polynomial
+import numpy as np
 import rsa
+
+def polynomial_tests():
+    '''tests for encrypting Polynomials'''
+    pows = [ 2 ** p for p in range(2, 12)]
+    keys = Keys(128)
+    enc, dec, N = keys.pub, keys.priv, keys.N
+
+    for power in pows:
+        print(f'------ Testing for coef vector of length {power} ------')
+        passed = 0
+        for trial in range(100):
+            a = Polynomial(np.random.randint(0, 256, power))
+            a_dft = a.dft_regular()
+            a_dft_bytes = convert_arr_to_bytes(a_dft)
+
+            cipher = encrypt(a_dft_bytes, enc, N)
+            decipher = encrypt(cipher, dec, N)
+
+            d = convert_bytes_to_arr(decipher)
+            d = d[np.where(d != 0)]
+            print(d)
+            print(a_dft)
+            if np.allclose(a_dft, d, rtol=1e+002, atol=1e-5):
+                passed += 1
+
+        print(f'passed {passed}% for coef of length {power}\n')
+
 
 def keytest():
     '''
@@ -18,11 +48,11 @@ def keytest():
             # msg='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+=~`'
             # msg2='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
             for trial in range(trials):
-                keys = keygen(bitlen)
-                c1 = encrypt(msg.encode('utf-8'), keys['public'][0], keys['public'][1], keysize=bitlen)
-                d1 = encrypt(c1, keys['private'][0], keys['private'][1], keysize=bitlen)
-                c2 = encrypt(msg2.encode('utf-8'), keys['public'][0], keys['public'][1], keysize=bitlen)
-                d2 = encrypt(c2, keys['private'][0], keys['private'][1], keysize=bitlen)
+                keys = Keys(bitlen)
+                c1 = encrypt(msg.encode('utf-8'), keys.pub, keys.N, keysize=bitlen)
+                d1 = encrypt(c1, keys.priv, keys.N, keysize=bitlen)
+                c2 = encrypt(msg2.encode('utf-8'), keys.pub, keys.N, keysize=bitlen)
+                d2 = encrypt(c2, keys.priv, keys.N, keysize=bitlen)
                 if d1 == msg.encode('utf-8'):
                     passed1 += 1
                 if d2 == msg2.encode('utf-8'):
@@ -50,7 +80,7 @@ def module_test():
             print(f'------Testing for {i} bits------')
             for trial in range(trials):
                 pub, priv = rsa.newkeys(nbits=i)
-                keys = keygen(i)
+                keys = Keys(i)
                 rc1 = rsa.encrypt(msg1.encode('utf-8'), pub)
                 rd1 = rsa.decrypt(rc1, priv)
                 c1 = encrypt(msg1.encode('utf-8'), keys['public'][0], keys['public'][1], keysize=i)
@@ -74,5 +104,6 @@ def module_test():
         print(f'overflowed for {i} bits at iteration {trial}')
 
 if __name__ == '__main__':
-    keytest()
-    module_test()
+    # keytest()
+    # module_test()
+    polynomial_tests()
