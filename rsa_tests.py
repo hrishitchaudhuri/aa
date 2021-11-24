@@ -10,8 +10,9 @@ def get_pv(pol: Polynomial) -> list:
 
 def unit(arr, e, d, N) -> bool:
     '''unit test case for one pv form: arr'''
-    c = encrypt(arr.tobytes(), e, N)
-    if arr.tobytes() == encrypt(c, d, N):
+    c = encrypt(str(arr).encode(), e, N)
+    #print(arr.tobytes(), encrypt(c, d, N))
+    if str(arr) == encrypt(c, d, N).decode(errors='ignore'):
         return True
     return False
 
@@ -19,7 +20,7 @@ def success_rate():
     '''testing for varying key sizes'''
     try:
         bitlens = [128, 256, 512, 1024, 2048]
-        a = Polynomial(np.random.randint(0, 256, 128))
+        a = Polynomial(np.random.randint(0, 256, 8))
         for blen in bitlens:
             keys = Keys(blen)
             e, d, N = keys.pub, keys.priv, keys.N

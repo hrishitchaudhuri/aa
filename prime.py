@@ -28,11 +28,6 @@ def extended_gcd(a: int, b: int):
 
 def inverse(x: int, n: int) -> int:
     """Returns the inverse of x % n under multiplication, a.k.a x^-1 (mod n)
-
-    >>> inverse(7, 4)
-    3
-    >>> (inverse(143, 4) * 143) % 4
-    1
     """
 
     (divider, inv, _) = extended_gcd(x, n)

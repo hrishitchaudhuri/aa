@@ -19,11 +19,11 @@ if __name__ == '__main__':
     e, d, N = keys.pub, keys.priv, keys.N
     a = Polynomial(np.random.randint(0, 256, 8))
     pv = np.array(list((x, int(a.eval(x))) for x in [random() for _ in range(a.degree)]))
-    pvb = pv.tobytes()
+    pvb = str(pv).encode('ascii')
     cipher = encrypt(pvb, e, N)
-    decipher = encrypt(cipher, d, N)
-    d = np.frombuffer(decipher, dtype=pv.dtype)
-    print(decipher == pvb)
-
-    # print(d)
-    # print(pv)
+    decipher = encrypt(cipher, d, N).decode('ascii', errors='ignore')
+    # d = np.frombuffer(decipher, dtype=pv.dtype)
+    print(pvb.decode())
+    print(decipher)
+    # print(len(d), d)
+    # np.allclose(pv.flatten(), d[:128])
