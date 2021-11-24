@@ -1,7 +1,7 @@
 """Testing for RSA Enc/Dec on Polynomials in PV form (Point Value)"""
 import numpy as np
 from random import random
-from RSA import encrypt, Keys
+from RSA import decrypt, encrypt, Keys
 from polynomial import Polynomial
 
 def get_pv(pol: Polynomial) -> list:
@@ -12,7 +12,7 @@ def unit(arr, e, d, N) -> bool:
     '''unit test case for one pv form: arr'''
     c = encrypt(str(arr).encode(), e, N)
     #print(arr.tobytes(), encrypt(c, d, N))
-    if str(arr) == encrypt(c, d, N).decode(errors='ignore'):
+    if str(arr) == decrypt(c, d, N).decode():
         return True
     return False
 
