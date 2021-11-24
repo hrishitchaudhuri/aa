@@ -18,8 +18,13 @@ class Keys():
         e = choice([2**i + 1 for i in range(1,32)])
 
         while extended_gcd(e, (p - 1) * (q - 1))[0] != 1:
+<<<<<<< HEAD
             e = choice([2**i + 1 for i in range(1,32)])
         d = inverse(e, (p - 1) * (q - 1))
+=======
+            e = choice([2*i + 1 for i in range(2**5)])
+        d = pow(e, -1, (p - 1) * (q - 1))
+>>>>>>> 841c0d32ff85824dff4a7abfdbbc38fc3c923da6
         self.pub = e
         self.priv = d
         self.N = n
@@ -39,7 +44,7 @@ def generate_large_odd(bit_length):
     return num
 
 def is_prime(num):
-    if pseudoprime(num, 10) and miller_rabin_primality_testing(num, 10):
+    if pseudoprime(num) and miller_rabin_primality_testing(num, 10):
         return True
 
 def generate_large_primes(bitlength):
@@ -69,7 +74,7 @@ def gcd(first, second):
         first, second = second % first, first
     return second
 
-def __encrypt(block: bytes, enc: int, N: int, bsize: int) -> bytes:
+def __encrypt(block: bytes, enc: int, N: int) -> bytes:
     '''
         keysize byte block encrypted/decrypted using pubkey/privkey
     '''
@@ -77,7 +82,13 @@ def __encrypt(block: bytes, enc: int, N: int, bsize: int) -> bytes:
     if blocknum > N:
         raise OverflowError('aaaaaaaaaaaaa')
     c = pow(blocknum, enc, N)
+<<<<<<< HEAD
     res = c.to_bytes(ceil_div(c.bit_length(), 8), 'big')
+=======
+    # print("<", blocknum, c, ">")
+    # res = c.to_bytes(math.ceil(c.bit_length() / 8), 'big')
+    res = c.to_bytes(math.ceil(N.bit_length() / 8), 'big')
+>>>>>>> 841c0d32ff85824dff4a7abfdbbc38fc3c923da6
     return res
 
 def encrypt(msg: bytes, enc: int, N: int) -> bytes:
@@ -93,12 +104,13 @@ def encrypt(msg: bytes, enc: int, N: int) -> bytes:
     # block_size = math.ceil(N.bit_length() / 8)
 
     if len(msg) <= block_size:
-        return __encrypt(msg, enc, N, block_size)
+        return __encrypt(msg, enc, N)
 
     cipher = b''
     i = 0
     while i <= len(msg) - block_size:
         block = msg[i: i + block_size]
+<<<<<<< HEAD
         block = pack('q',block)
         # print(block)
         cipher = cipher + __encrypt(block, enc, N, block_size)
@@ -106,3 +118,53 @@ def encrypt(msg: bytes, enc: int, N: int) -> bytes:
     # print(msg[i:])
     cipher += __encrypt(msg[i:], enc, N, block_size)
     return cipher
+=======
+        cipher = cipher + __encrypt(block, enc, N)
+        i += block_size
+    cipher += __encrypt(msg[i:], enc, N)
+    """
+    res = b''
+    for i in cipher:
+        if i != 0:
+            res += i.to_bytes(1, 'big')
+    """
+    return cipher
+
+def __decrypt(block: bytes, enc: int, N: int) -> bytes:
+    blocknum = int.from_bytes(block, 'big')
+    c = pow(blocknum, enc, N)
+    # print("<", blocknum, c, ">")
+    # res = c.to_bytes(math.ceil(c.bit_length() / 8), 'big')
+    res = c.to_bytes(8, 'big')
+    return res
+
+def decrypt(msg: bytes, dec: int, N: int) -> bytes:
+    block_size = math.ceil(N.bit_length() / 8)
+
+    if len(msg) <= block_size:
+        return __decrypt(msg, dec, N)
+
+    decipher = b''
+    i = 0
+    
+    while i < len(msg) - block_size:
+        block = msg[i: i + block_size]
+        decipher = decipher + __decrypt(block, dec, N)
+        i += block_size
+    
+    # decipher += __decrypt(msg[i:], dec, N)
+
+    if i != len(msg):
+        final_block = int.from_bytes(msg[i:], 'big')
+        result = pow(final_block, dec, N)
+        required_bytes = math.ceil(result.bit_length() / 8)
+        # print(required_bytes)
+        decipher += result.to_bytes(required_bytes, 'big')
+    """
+    res = b''
+    for i in decipher:
+        if i != 0:
+            res += i.to_bytes(1, 'big')
+    """
+    return decipher
+>>>>>>> 841c0d32ff85824dff4a7abfdbbc38fc3c923da6

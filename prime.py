@@ -37,13 +37,12 @@ def inverse(x: int, n: int) -> int:
 
     return inv
 
-def pseudoprime(num, trials):
+def pseudoprime(num):
     '''
     Runs base2 primality test on num with trials
     '''
-    for _ in range(trials):
-        if pow(2, num-1, num) != 1:
-            return False
+    if pow(2, num-1, num) != 1:
+        return False
     return True
 
 
