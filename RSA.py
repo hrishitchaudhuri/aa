@@ -1,7 +1,6 @@
 '''RSA IMPLEMENTATION'''
 import math
-from struct import pack
-from random import randint, choice
+from random import choice
 from prime import *
 
 class Keys():
@@ -18,13 +17,8 @@ class Keys():
         e = choice([2**i + 1 for i in range(1,32)])
 
         while extended_gcd(e, (p - 1) * (q - 1))[0] != 1:
-<<<<<<< HEAD
-            e = choice([2**i + 1 for i in range(1,32)])
-        d = inverse(e, (p - 1) * (q - 1))
-=======
             e = choice([2*i + 1 for i in range(2**5)])
         d = pow(e, -1, (p - 1) * (q - 1))
->>>>>>> 841c0d32ff85824dff4a7abfdbbc38fc3c923da6
         self.pub = e
         self.priv = d
         self.N = n
@@ -82,13 +76,9 @@ def __encrypt(block: bytes, enc: int, N: int) -> bytes:
     if blocknum > N:
         raise OverflowError('aaaaaaaaaaaaa')
     c = pow(blocknum, enc, N)
-<<<<<<< HEAD
-    res = c.to_bytes(ceil_div(c.bit_length(), 8), 'big')
-=======
     # print("<", blocknum, c, ">")
     # res = c.to_bytes(math.ceil(c.bit_length() / 8), 'big')
     res = c.to_bytes(math.ceil(N.bit_length() / 8), 'big')
->>>>>>> 841c0d32ff85824dff4a7abfdbbc38fc3c923da6
     return res
 
 def encrypt(msg: bytes, enc: int, N: int) -> bytes:
@@ -110,15 +100,6 @@ def encrypt(msg: bytes, enc: int, N: int) -> bytes:
     i = 0
     while i <= len(msg) - block_size:
         block = msg[i: i + block_size]
-<<<<<<< HEAD
-        block = pack('q',block)
-        # print(block)
-        cipher = cipher + __encrypt(block, enc, N, block_size)
-        i += block_size
-    # print(msg[i:])
-    cipher += __encrypt(msg[i:], enc, N, block_size)
-    return cipher
-=======
         cipher = cipher + __encrypt(block, enc, N)
         i += block_size
     cipher += __encrypt(msg[i:], enc, N)
@@ -167,4 +148,3 @@ def decrypt(msg: bytes, dec: int, N: int) -> bytes:
             res += i.to_bytes(1, 'big')
     """
     return decipher
->>>>>>> 841c0d32ff85824dff4a7abfdbbc38fc3c923da6

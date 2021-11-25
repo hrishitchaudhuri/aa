@@ -20,14 +20,6 @@ if __name__ == '__main__':
     print(e, d, N)
     a = Polynomial(np.random.randint(0, 256, 128))
     pv = np.array(list((x, int(a.eval(x))) for x in [random() for _ in range(a.degree)]))
-<<<<<<< HEAD
-    pvb = str(pv).encode()
-    cipher = encrypt(pvb, e, N)
-    decipher = encrypt(cipher, d, N).decode(errors='ignore')
-    print(pvb.decode(errors='ignore'))
-    print(decipher)
-    print(e, d, N)
-=======
 
     print("ENCRYPT:")
     pvb = str(pv).encode('ascii')
@@ -41,4 +33,3 @@ if __name__ == '__main__':
     print(pvb.decode('ascii') == decipher)
     # print(len(d), d)
     # np.allclose(pv.flatten(), d[:128])
->>>>>>> 841c0d32ff85824dff4a7abfdbbc38fc3c923da6
