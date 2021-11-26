@@ -1,99 +1,90 @@
 """Module for prime related functions"""
 import math
-from random import randint
+import random
 
-def extended_gcd(a: int, b: int):
-    """Returns a tuple (r, i, j) such that r = gcd(a, b) = ia + jb
+def extended_gcd(num_1, num_2):
     """
-    # r = gcd(a,b) i = multiplicitive inverse of a mod b
-    #      or      j = multiplicitive inverse of b mod a
-    # Neg return values for i or j are made positive mod b or a respectively
-    # Iterateive Version is faster and uses much less stack space
-    x = 0
-    y = 1
-    lx = 1
-    ly = 0
-    oa = a  # Remember original a/b to remove
-    ob = b  # negative values from return results
-    while b != 0:
-        q = a // b
-        (a, b) = (b, a % b)
-        (x, lx) = ((lx - (q * x)), x)
-        (y, ly) = ((ly - (q * y)), y)
-    if lx < 0:
-        lx += ob  # If neg wrap modulo orignal b
-    if ly < 0:
-        ly += oa  # If neg wrap modulo orignal a
-    return a, lx, ly  # Return only positive values
+    Returns a tuple (r, i, j) such that r = gcd(num_1, num_2) = i*num_1 + j*num_2
+    """
+    x_0 = 0
+    y_0 = 1
+    lx_0 = 1
+    ly_0 = 0
+    orig_a = num_1
+    orig_b = num_2
 
-def inverse(x: int, n: int) -> int:
-    """Returns the inverse of x % n under multiplication, a.k.a x^-1 (mod n)
+    while num_2 != 0:
+        quot = num_1 // num_2
+        (num_1, num_2) = (num_2, num_1 % num_2)
+        (x_0, lx_0) = ((lx_0 - (quot * x_0)), x_0)
+        (y_0, ly_0) = ((ly_0 - (quot * y_0)), y_0)
+    if lx_0 < 0:
+        lx_0 += orig_b
+    if ly_0 < 0:
+        ly_0 += orig_a
+    return num_1, lx_0, ly_0
+
+
+def inverse(orig, mod):
+    """
+    Returns the inverse of orig % mod under multiplication.
     """
 
-    (divider, inv, _) = extended_gcd(x, n)
+    (divider, inv, _) = extended_gcd(orig, mod)
 
     if divider != 1:
-        raise ValueError(x, n, divider)
+        raise ValueError(orig, mod, divider)
 
     return inv
 
+
 def pseudoprime(num):
-    '''
-    Runs base2 primality test on num with trials
-    '''
+    """
+    Runs Fermat's pseudo-prime test on base 2.
+    """
     if pow(2, num-1, num) != 1:
         return False
     return True
 
 
-def trial_division(num, trials):
-    '''
-    Trial Division Test
-    '''
-    for _ in range(trials):
-        check = randint(2, int(math.sqrt(num)))
+def trial_division(num):
+    """
+    Tests primality via trial by division.
+    """
+    for check in range(math.ceil(math.sqrt(num))):
         if num % check == 0:
             return False
     return True
 
 
-def miller_rabin_primality_testing(n, k):
-    """Calculates whether n is composite (which is always correct) or prime
-    (which theoretically is incorrect with error probability 4**-k), by
-    applying Miller-Rabin primality testing.
+def miller_rabin_primality_testing(num, error):
     """
-    # prevent potential infinite loop when d = 0
-    if n < 2:
+    Runs the Miller-Rabin test.
+    """
+    if num < 2:
         return False
 
-    # Decompose (n - 1) to write it as (2 ** r) * d
-    # While d is even, divide it by 2 and increase the exponent.
-    d = n - 1
-    r = 0
+    diff = num - 1
+    rem = 0
 
-    while not d & 1:
-        r += 1
-        d >>= 1
+    while not diff & 1:
+        rem += 1
+        diff >>= 1
 
-    # Test k witnesses.
-    for _ in range(k):
-        # Generate random integer a, where 2 <= a <= (n - 2)
-        a = randint(1, n - 1)
+    for _ in range(error):
+        rand = random.randint(1, num - 1)
 
-        x = pow(a, d, n)
-        if x == 1 or x == n - 1:
+        check = pow(rand, diff, num)
+        if check in (1, num - 1):
             continue
 
-        for _ in range(r - 1):
-            x = pow(x, 2, n)
-            if x == 1:
-                # n is composite.
+        for _ in range(rem - 1):
+            check = pow(check, 2, num)
+            if check == 1:
                 return False
-            if x == n - 1:
-                # Exit inner loop and continue with next witness.
+            if check == num - 1:
                 break
         else:
-            # If loop doesn't break, n is composite.
             return False
 
     return True

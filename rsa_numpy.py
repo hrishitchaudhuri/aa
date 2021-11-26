@@ -27,9 +27,6 @@ if __name__ == '__main__':
     
     print("DECRYPT:")
     decipher = decrypt(cipher, d, N).decode('ascii')
-    # d = np.frombuffer(decipher, dtype=pv.dtype)
     print(pvb.decode())
     print(decipher)
     print(pvb.decode('ascii') == decipher)
-    # print(len(d), d)
-    # np.allclose(pv.flatten(), d[:128])

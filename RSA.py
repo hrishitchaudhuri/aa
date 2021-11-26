@@ -84,7 +84,6 @@ def encrypt(msg: bytes, enc: int, N: int) -> bytes:
         same function is called for decrypt as well (pass e = d for decryption)
     '''
     block_size = 8
-    # block_size = math.ceil(N.bit_length() / 8)
 
     if len(msg) <= block_size:
         return __encrypt(msg, enc, N)
@@ -96,19 +95,11 @@ def encrypt(msg: bytes, enc: int, N: int) -> bytes:
         cipher = cipher + __encrypt(block, enc, N)
         i += block_size
     cipher += __encrypt(msg[i:], enc, N)
-    """
-    res = b''
-    for i in cipher:
-        if i != 0:
-            res += i.to_bytes(1, 'big')
-    """
     return cipher
 
 def __decrypt(block: bytes, enc: int, N: int) -> bytes:
     blocknum = int.from_bytes(block, 'big')
     c = pow(blocknum, enc, N)
-    # print("<", blocknum, c, ">")
-    # res = c.to_bytes(math.ceil(c.bit_length() / 8), 'big')
     res = c.to_bytes(8, 'big')
     return res
 
@@ -125,19 +116,12 @@ def decrypt(msg: bytes, dec: int, N: int) -> bytes:
         block = msg[i: i + block_size]
         decipher = decipher + __decrypt(block, dec, N)
         i += block_size
-    
-    # decipher += __decrypt(msg[i:], dec, N)
 
     if i != len(msg):
         final_block = int.from_bytes(msg[i:], 'big')
         result = pow(final_block, dec, N)
         required_bytes = math.ceil(result.bit_length() / 8)
-        # print(required_bytes)
         decipher += result.to_bytes(required_bytes, 'big')
-    """
-    res = b''
-    for i in decipher:
-        if i != 0:
-            res += i.to_bytes(1, 'big')
-    """
+
     return decipher
+    
