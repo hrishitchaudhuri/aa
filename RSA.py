@@ -1,55 +1,36 @@
-'''RSA IMPLEMENTATION'''
+"""Core functions for RSA cryptosystem"""
 import math
-from random import randint, choice
-from prime import *
+import random
 
-class Keys():
-    '''
-    Key class
-    '''
-    def __init__(self, size):
-        '''
-        Generates RSA public and private keys of given bitlength
-        '''
-        p, q = generate_large_primes(size)
-        n = p * q
-        # print('n bits: ', n.bit_length())
-        
-        e = choice([2*i+1 for i in range(2**5)])
-
-        while extended_gcd(e, (p - 1) * (q - 1))[0] != 1:
-            e = choice([2*i + 1 for i in range(2**5)])
-        d = pow(e, -1, (p - 1) * (q - 1))
-        self.pub = e
-        self.priv = d
-        self.N = n
+import prime
 
 def generate_large_odd(bit_length):
-    '''
-        Randomly generate a binary string of given bit length (ending with 1 to make sure its odd)
-        input: bit length
-        output: odd number of given bit length
-    '''
+    """
+    Randomly generate an odd binary string of given bit length.
+    """
     num = ''
     for _ in range((bit_length // 2) - 1):
-        num += choice(['0', '1'])
+        num += random.choice(['0', '1'])
     num += '1'
     num = '0b' + num
     num = (int(num, 2))
     return num
 
 def is_prime(num):
-    if pseudoprime(num) and miller_rabin_primality_testing(num, 10):
+    """
+    Run primality tests on given number.
+    """
+    if prime.pseudoprime(num) and prime.miller_rabin_primality_testing(num, 10):
         return True
+    return False
 
 def generate_large_primes(bitlength):
-    '''
-        generates 2 large odd numbers of given bit length,
-        runs fermat and M-R test and trial division for primality
-        return 2 large primes of given bitlength
-    '''
+    """
+    Randomly generate two odd numbers of given bit length.
+    """
     num1 = generate_large_odd(bitlength)
     num2 = generate_large_odd(bitlength)
+
     while not is_prime(num1):
         num1 = generate_large_odd(bitlength)
     while not is_prime(num2):
@@ -57,71 +38,66 @@ def generate_large_primes(bitlength):
 
     return max(num1, num2), min(num1, num2)
 
+def __encrypt(block, enc, num):
+    """
+    Encrypt message of given block-size using given key.
+    """
+    blocknum = int.from_bytes(block, 'big', signed=False)
+    if blocknum > num:
+        raise OverflowError()
+    cipher = pow(blocknum, enc, num)
 
-def gcd(first, second):
-    while first != 0:
-        first, second = second % first, first
-    return second
-
-def __encrypt(block: bytes, enc: int, N: int) -> bytes:
-    '''
-        keysize byte block encrypted/decrypted using pubkey/privkey
-    '''
-    blocknum = int.from_bytes(block, 'big')
-    c = pow(blocknum, enc, N)
-    # print("<", blocknum, c, ">")
-    # res = c.to_bytes(math.ceil(c.bit_length() / 8), 'big')
-    res = c.to_bytes(math.ceil(N.bit_length() / 8), 'big')
+    res = cipher.to_bytes(math.ceil(num.bit_length() / 8), 'big')
     return res
 
-def encrypt(msg: bytes, enc: int, N: int) -> bytes:
-    '''
-        Only pass bytes/bytearray as msg input
-        msg: byte stream to be encrypted
-        e, n: derived from public key
-        returns cipher (bytestream) which is formed by c=(msg**e)mod n
-        calls __encrypt by splitting msg bytestream into 8 byte blocks
-        same function is called for decrypt as well (pass e = d for decryption)
-    '''
+def encrypt(msg, enc, num):
+    """
+    Encrypt message of variable block-size using RSA cryptography.
+    """
     block_size = 8
 
     if len(msg) <= block_size:
-        return __encrypt(msg, enc, N)
+        return __encrypt(msg, enc, num)
 
     cipher = b''
     i = 0
     while i <= len(msg) - block_size:
         block = msg[i: i + block_size]
-        cipher = cipher + __encrypt(block, enc, N)
+        cipher = cipher + __encrypt(block, enc, num)
         i += block_size
-    cipher += __encrypt(msg[i:], enc, N)
+    cipher += __encrypt(msg[i:], enc, num)
     return cipher
 
-def __decrypt(block: bytes, enc: int, N: int) -> bytes:
+def __decrypt(block, enc, num):
+    """
+    Decrypt message of given block-size using given key.
+    """
     blocknum = int.from_bytes(block, 'big')
-    c = pow(blocknum, enc, N)
-    res = c.to_bytes(8, 'big')
+    cipher = pow(blocknum, enc, num)
+    res = cipher.to_bytes(8, 'big')
     return res
 
-def decrypt(msg: bytes, dec: int, N: int) -> bytes:
-    block_size = math.ceil(N.bit_length() / 8)
+def decrypt(msg, dec, num):
+    """
+    Encrypt message of variable block-size using RSA cryptography.
+    """
+    block_size = math.ceil(num.bit_length() / 8)
 
     if len(msg) <= block_size:
-        return __decrypt(msg, dec, N)
+        return __decrypt(msg, dec, num)
 
     decipher = b''
     i = 0
-    
+
     while i < len(msg) - block_size:
         block = msg[i: i + block_size]
-        decipher = decipher + __decrypt(block, dec, N)
+        decipher = decipher + __decrypt(block, dec, num)
         i += block_size
 
     if i != len(msg):
         final_block = int.from_bytes(msg[i:], 'big')
-        result = pow(final_block, dec, N)
+        result = pow(final_block, dec, num)
         required_bytes = math.ceil(result.bit_length() / 8)
         decipher += result.to_bytes(required_bytes, 'big')
 
     return decipher
-    
